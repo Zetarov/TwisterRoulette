@@ -22,18 +22,22 @@ protected:
   sf::Time ticksLength;
 
   bool isLaunch;
+  bool quadraticSpeedEnabled;
 
   const unsigned int choiceNumber;
 
   //getters
   float getRotateNeedleCallsForARevolution() const;
+  float getQuadraticDecreasingSpeed();
 
   //methods
   void rotateNeedle(float times);
-  void rotateNeedleManually(float times, unsigned int speed);
+  void rotateNeedleManually(float times, float speed);
   void reset();
 
   unsigned int speed;
+
+
 
 public:
   //constructors
@@ -56,6 +60,7 @@ public:
   void stop();
   bool launchAndStopIn(sf::Time time);
   bool launchAndStopRandomly(unsigned int fullRevolutionNumber);
+  bool launchAndStopRandomlyQuadratic();
   void update();
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

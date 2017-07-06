@@ -7,13 +7,19 @@ float Roulette::getRotateNeedleCallsForARevolution() const
     return (360/speed);
 }
 
+float Roulette::getQuadraticDecreasingSpeed()
+{
+  float translatedLeft(clock.getElapsedTime().asSeconds()-rotatingLength.asSeconds());
+  return translatedLeft*translatedLeft*speed;
+}
+
 //private - methods
 void Roulette::rotateNeedle(float times)
 {
     rotateNeedleManually(times, speed);
 }
 
-void Roulette::rotateNeedleManually(float times, unsigned int speed)
+void Roulette::rotateNeedleManually(float times, float speed)
 {
     needleSprite.rotate(times*speed);
 }
@@ -50,6 +56,7 @@ Roulette::Roulette(sf::Texture* texture, unsigned int choiceNumber,
   ticksLength = sf::seconds(0.05);
 
   speed = 1;
+  quadraticSpeedEnabled = true;
 }
 
 //getters
@@ -119,15 +126,28 @@ bool Roulette::launchAndStopIn(sf::Time time)
 bool Roulette::launchAndStopRandomly(unsigned int fullRevolution)
 {
   if(isLaunch) return false;
-
-  int randomStart(rand()%(speed%361)-rand()%(speed%361)); //To avoid side effect of speed (can block on certain values)
-  rotateNeedleManually(randomStart, 1);
-
+  quadraticSpeedEnabled = false;
   float revolutionTime(getTimeForARevolution().asSeconds());
   float lastRevPercentage((rand()%360)/360.0);
-  launchAndStopIn(sf::seconds(revolutionTime*fullRevolution+revolutionTime*lastRevPercentage)); // revolutionTime*fullRevolution+revolutionTime*rand()%360)
+  float necessarySeconds(revolutionTime*fullRevolution+revolutionTime*lastRevPercentage);
+  int randomStart;
+
+  randomStart=rand()%(speed%361)-rand()%(speed%361); //To avoid side effect of speed (can block on certain values)
+
+  rotateNeedleManually(randomStart, 1);
+  launchAndStopIn(sf::seconds(necessarySeconds)); // revolutionTime*fullRevolution+revolutionTime*rand()%360)
 
   //TODO animation d'arrivée qui montre la partie sélectionnée de la roue
+
+  return true;
+}
+
+bool Roulette::launchAndStopRandomlyQuadratic()
+{
+  if(isLaunch) return false;
+  quadraticSpeedEnabled = true;
+
+  launchAndStopIn(sf::seconds(rand()%5+3));
 
   return true;
 }
@@ -144,7 +164,10 @@ void Roulette::update()
     float elapsedTicks((tick-lastTick)/ticksLength);
     if(lastTick+ticksLength<tick){
       lastTick = tick;
-      rotateNeedle(elapsedTicks);
+      if(quadraticSpeedEnabled)
+        rotateNeedleManually(elapsedTicks, getQuadraticDecreasingSpeed());
+      else
+        rotateNeedle(elapsedTicks);
     }
   }
 }

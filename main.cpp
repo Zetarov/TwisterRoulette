@@ -16,12 +16,12 @@ int main()
   Roulette roulette1(&texture, 4,
     sf::IntRect(0, 0, 378, 378), 0,
     sf::IntRect(378, 0, 378,378), 0);
-  roulette1.setSpeed(5);
+  roulette1.setSpeed(1);
   roulette1.centerInRect(sf::FloatRect(0,0,width/2,height));
   Roulette roulette2(&texture, 4,
     sf::IntRect(756, 0, 378, 378), 0,
     sf::IntRect(1134, 0, 378,378), 0);
-  roulette2.setSpeed(5);
+  roulette2.setSpeed(1);
   roulette2.centerInRect(sf::FloatRect(width/2,0,width/2,height));
   while (rw.isOpen())
   {/*
@@ -52,12 +52,15 @@ int main()
               switch(event.key.code){
                 case sf::Keyboard::Left:
                   //roulette1.launch();
+                  roulette1.launchAndStopIn(sf::seconds(6.0));
                   break;
                 case sf::Keyboard::Right:
                   //roulette1.stop();
+                  roulette2.launchAndStopIn(sf::seconds(6.0));
                   break;
                 case sf::Keyboard::Up:
-                  //roulette1.launchAndStopIn(sf::seconds(2.0));
+                  roulette1.launchAndStopRandomlyQuadratic();
+                  roulette2.launchAndStopRandomlyQuadratic();
                   break;
                 case sf::Keyboard::Down:
                   roulette1.launchAndStopRandomly(1);
